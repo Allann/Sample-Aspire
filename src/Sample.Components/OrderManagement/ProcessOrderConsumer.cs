@@ -1,10 +1,11 @@
-namespace Sample.Components.OrderManagement;
 
 using Contracts;
+
 using MassTransit;
+
 using Microsoft.Extensions.Logging;
 
-
+namespace Sample.Components.OrderManagement;
 public class ProcessOrderConsumer :
     IConsumer<ProcessOrder>
 {

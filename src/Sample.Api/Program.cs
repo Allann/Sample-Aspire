@@ -1,36 +1,29 @@
 using MassTransit;
+
 using Sample.Components;
 using Sample.Contracts;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.AddServiceDefaults();
 
-var connectionString = builder.Configuration.GetConnectionString("sample");
-
-builder.Services.AddOptions<SqlTransportOptions>()
-    .Configure(options =>
-    {
-        options.ConnectionString = connectionString;
-    });
-
 builder.Services.AddMassTransit(x =>
 {
-    x.AddSqlMessageScheduler();
-
-    x.UsingPostgres((context, cfg) =>
+    x.AddDelayedMessageScheduler();
+    x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.UseSqlMessageScheduler();
+        string? connectionString = builder.Configuration.GetConnectionString("messaging");
+        cfg.Host(connectionString);
 
         cfg.UsePublishFilter(typeof(CustomerNumberPartitionKeyFilter<>), context);
         cfg.UseSendFilter(typeof(CustomerNumberPartitionKeyFilter<>), context);
     });
 });
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {

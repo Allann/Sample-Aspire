@@ -1,22 +1,24 @@
-namespace Sample.Components;
-
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using MassTransit;
 using MassTransit.Internals;
 
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+
+namespace Sample.Components;
 
 public class CustomerNumberPartitionKeyFilter<T> :
     IFilter<SendContext<T>>,
     IFilter<PublishContext<T>>
     where T : class
 {
-    static readonly ReadOnlyProperty<T, string>? _property;
+    private static readonly ReadOnlyProperty<T, string>? _property;
 
     static CustomerNumberPartitionKeyFilter()
     {
-        if (IsCustomerMessage(out var propertyInfo))
+        if (IsCustomerMessage(out PropertyInfo? propertyInfo))
+        {
             _property = new ReadOnlyProperty<T, string>(propertyInfo);
+        }
     }
 
     public Task Send(PublishContext<T> context, IPipe<PublishContext<T>> next)
@@ -37,18 +39,22 @@ public class CustomerNumberPartitionKeyFilter<T> :
     {
     }
 
-    static void SetPartitionKey(SendContext<T> context)
+    private static void SetPartitionKey(SendContext<T> context)
     {
         if (_property == null)
+        {
             return;
+        }
 
-        var customerNumber = _property.GetProperty(context.Message);
+        string customerNumber = _property.GetProperty(context.Message);
 
         if (!string.IsNullOrWhiteSpace(customerNumber))
+        {
             context.TrySetPartitionKey(customerNumber);
+        }
     }
 
-    static bool IsCustomerMessage([NotNullWhen(true)] out PropertyInfo? propertyInfo)
+    private static bool IsCustomerMessage([NotNullWhen(true)] out PropertyInfo? propertyInfo)
     {
         propertyInfo = typeof(T).GetProperty("CustomerNumber");
 

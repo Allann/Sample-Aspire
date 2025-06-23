@@ -1,25 +1,11 @@
 using MassTransit;
-using Npgsql;
+
 using Sample.Components;
 using Sample.Components.OrderManagement;
 
-var builder = Host.CreateApplicationBuilder(args);
+HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
-
-var connectionString = builder.Configuration.GetConnectionString("sample");
-
-builder.Services.AddOptions<SqlTransportOptions>()
-    .Configure(options =>
-    {
-        options.ConnectionString = connectionString;
-    });
-
-builder.Services.AddPostgresMigrationHostedService(options =>
-{
-    // default, but shown for completeness
-    options.CreateDatabase = true;
-});
 
 builder.Services.AddMassTransit(x =>
 {
@@ -37,17 +23,26 @@ builder.Services.AddMassTransit(x =>
         }
     });
 
-    x.AddSqlMessageScheduler();
+    x.AddDelayedMessageScheduler();
 
-    x.UsingPostgres((context, cfg) =>
+    x.UsingRabbitMq((context, cfg) =>
     {
+        string? connectionString = builder.Configuration.GetConnectionString("messaging");
+        if (connectionString == null)
+        {
+            throw new InvalidOperationException("Connection string 'messaging' is not configured.");
+        }
+
+        cfg.Host(new Uri(connectionString), h => { });
+
         cfg.UseSqlMessageScheduler();
 
         cfg.UsePublishFilter(typeof(CustomerNumberPartitionKeyFilter<>), context);
         cfg.UseSendFilter(typeof(CustomerNumberPartitionKeyFilter<>), context);
+
         cfg.ConfigureEndpoints(context);
     });
 });
 
-var host = builder.Build();
+IHost host = builder.Build();
 host.Run();

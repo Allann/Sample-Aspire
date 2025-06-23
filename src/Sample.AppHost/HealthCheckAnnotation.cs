@@ -1,8 +1,7 @@
-namespace Sample.AppHost;
 
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-
+namespace Sample.AppHost;
 public class HealthCheckAnnotation(Func<IResource, CancellationToken, Task<IHealthCheck?>> healthCheckFactory) : IResourceAnnotation
 {
     public Func<IResource, CancellationToken, Task<IHealthCheck?>> HealthCheckFactory { get; } = healthCheckFactory;
