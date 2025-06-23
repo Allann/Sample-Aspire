@@ -1,7 +1,5 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <Sdk Name="Aspire.AppHost.Sdk" Version="9.0.0" />
-  
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Sdk Name="Aspire.AppHost.Sdk" Version="9.3.1" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
@@ -10,16 +8,12 @@
     <IsAspireHost>true</IsAspireHost>
     <UserSecretsId>9033767a-f0a0-40ca-bf8c-e539ee8e41f6</UserSecretsId>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.0.0" />
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.0.0" />
-    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="8.0.2" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.1" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="9.3.1" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Sample.Api\Sample.Api.csproj" />
     <ProjectReference Include="..\Sample.BackEnd\Sample.BackEnd.csproj" />
   </ItemGroup>
-
 </Project>

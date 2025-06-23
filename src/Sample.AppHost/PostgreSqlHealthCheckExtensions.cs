@@ -1,8 +1,7 @@
-namespace Sample.AppHost;
 
 using HealthChecks.NpgSql;
 
-
+namespace Sample.AppHost;
 public static class PostgreSqlHealthCheckExtensions
 {
     /// <summary>
